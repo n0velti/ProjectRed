@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-projectred-dev-161502-authRole",
+      "UnauthRoleArn": "arn:aws:iam::260170723358:role/amplify-projectred-dev-161502-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::260170723358:role/amplify-projectred-dev-161502-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-projectred-dev-161502-deployment",
+      "UnauthRoleName": "amplify-projectred-dev-161502-unauthRole",
+      "StackName": "amplify-projectred-dev-161502",
+      "StackId": "arn:aws:cloudformation:ca-central-1:260170723358:stack/amplify-projectred-dev-161502/e11d70a0-74e1-11ed-9f46-06e1010defb6",
+      "AmplifyAppId": "d232pprwkzr27z"
+    },
+    "categories": {
+      "auth": {
+        "projectred14f87b02": {}
+      }
+    }
+  }
+}
