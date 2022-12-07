@@ -143,10 +143,8 @@ const listener = (data) => {
       logger.info('the Auth module is configured');
       break;
     case 'signIn':
-        console.log(data.payload.data.attributes.email);
-
         window.location.href  = "http://localhost:8080/"
-        userEmailText.textContent = data.payload.data.attributes.email;
+        onStart();
 
       logger.info('user signed in');
       break;
