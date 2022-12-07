@@ -1,5 +1,5 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const webpack = require('webpack');
 const path = require('path');
@@ -15,7 +15,8 @@ let multipleHtmlPlugins = htmlPageNames.map(name => {
 
 module.exports = {
   mode: 'development',
-  entry: {main: './src/app.js',
+  entry: {
+  main: './src/app.js',
   login: './src/login.js',
   signup: './src/signup.js'},
   output: {
@@ -38,9 +39,12 @@ module.exports = {
     watchFiles: ['src/*', 'index.html']
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: "index.html",
-      chunks: ['main']
-    })
-  ].concat(multipleHtmlPlugins)
+    new CopyWebpackPlugin({
+      patterns: ['index.html']
+    }),
+    new webpack.HotModuleReplacementPlugin()
+  
+    
+  ].concat(multipleHtmlPlugins),
+
 };
