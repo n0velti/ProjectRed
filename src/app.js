@@ -80,22 +80,44 @@ if(s_form)
     })
 }
 
+let forUsers = document.getElementById("forUsers");
+let forNonUsers = document.getElementById("forNonUsers");
+
+function setupHomeInterface()
+{
+  let forUsers = document.getElementById("forUsers");
+  forUsers.style.display = "block";
+  forNonUsers.style.display = "none";
+}
+
 async function onStart()
 {    
-
-
-    let user = await Auth.currentAuthenticatedUser();
-    
-
+  let user;
+  if(isSignedIn())
+  {
+    user = await Auth.currentAuthenticatedUser();
     if(userEmailText)
     {
         userEmailText.textContent = user.attributes.email;
 
     }
-
-
-
+    setupHomeInterface();
+  }else{
+      forUsers.style.display = "none";
+      forNonUsers.style.display = "block";
+  }
 }
+
+async function isSignedIn()
+{
+  try{
+    user = await Auth.currentAuthenticatedUser();
+    return true;
+  }catch{
+    return false;
+  }
+}
+
 onStart();
 
 async function signOut() {
