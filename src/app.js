@@ -1,6 +1,6 @@
-import { Amplify, Auth, Hub, Logger  } from 'aws-amplify';
+import { Amplify, Auth, Hub, Logger,DataStore  } from 'aws-amplify';
 import awsconfig from './aws-exports';
-
+import { Post, PostStatus } from './models'
 
 Amplify.configure(awsconfig);
 
@@ -213,3 +213,33 @@ const listener = (data) => {
 };
 
 Hub.listen('auth', listener);
+
+//DataStore
+
+let postBtn = document.getElementById("postBtn");
+if(postBtn){
+  postBtn.addEventListener("click", addPost);
+}
+
+async function addPost(){
+  try {
+    let user = await Auth.currentAuthenticatedUser();
+
+    let postTxt = document.getElementById("postText");
+    const p = {
+      postedByID: user.attributes.sub,
+      postContent: postTxt.textContent,
+      status: PostStatus.ACTIVE
+    }
+  
+    await DataStore.save(
+      new Post({
+        p
+      })
+    );
+    console.log(user);
+    console.log("Post saved successfully!");
+  } catch (error) {
+    console.log("Error saving post", error);
+  }
+}
