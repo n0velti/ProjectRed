@@ -1,7 +1,12 @@
-import { Amplify, Auth, Hub, Logger,DataStore  } from 'aws-amplify';
+import { Amplify, Auth, Hub, Logger,DataStore, API , graphqlOperation  } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import { Post, PostStatus } from './models'
+import { PostStatus } from './models'
+import {createPost} from './graphql/mutations'
+import {createUser} from './graphql/mutations'
 
+import {getUser, listUsers, listPosts} from './graphql/queries'
+import * as queries from './graphql/queries';
+import * as c_queries from './graphql/custom-queries';
 Amplify.configure(awsconfig);
 
 function listenToAutoSignInEvent() {
@@ -9,7 +14,6 @@ function listenToAutoSignInEvent() {
         const { event } = payload;
         if (event === 'autoSignIn') {
             const user = payload.data;
-            console.log(user.attributes.email);
         } else if (event === 'autoSignIn_failure') {
             // redirect to sign in page
             console.log("no auto signin");
@@ -37,7 +41,8 @@ export async function signUp() {
                 enabled: true,
             }
         });
-        console.log(user);
+
+
         return user;
 
     } catch (error) {
@@ -48,9 +53,6 @@ export async function signUp() {
 export async function signIn() {
     try {
         const user = await Auth.signIn(loginEmail.value, loginPassword.value);
-      //  postSignIn(user);
-        console.log(user);
-
     }catch (error) {
         console.log('error signing in', error);
     }
@@ -101,7 +103,45 @@ async function onStart()
         userEmailText.textContent = user.attributes.email;
 
     }
+
+
+    console.log("VAL" +user.attributes.sub);
+
+    const usersWithRegisteredID = await API.graphql({
+      query: c_queries.getUserByID,
+      variables: { userID: user.attributes.sub}
+    });
+
+    if(usersWithRegisteredID.data.listUsers.items.length == 0){
+        //user not in table
+        console.log(usersWithRegisteredID);
+
+        console.log("VAL2" +user.attributes.sub);
+
+        const val =
+        {userID: user.attributes.sub,
+         userEmail: user.attributes.email
+        }
+      
+      
+        await API.graphql(graphqlOperation(createUser, { input: val}));
+
+    }else{
+       //user in table
+        console.log(usersWithRegisteredID);
+    }
+
+
+
+
+
+    //get user with id
+   // let userId =
+  //  if()
+
+
     setupHomeInterface();
+    getPosts();
   }else{
       forUsers.style.display = "none";
       forNonUsers.style.display = "block";
@@ -226,20 +266,48 @@ async function addPost(){
     let user = await Auth.currentAuthenticatedUser();
 
     let postTxt = document.getElementById("postText");
+    console.log(user.pool.clientId);
     const p = {
       postedByID: user.attributes.sub,
-      postContent: postTxt.textContent,
+      postContent: postTxt.value,
       status: PostStatus.ACTIVE
     }
   
-    await DataStore.save(
-      new Post({
-        p
-      })
-    );
+  
+    await API.graphql(graphqlOperation(createPost, { input: p }));
     console.log(user);
     console.log("Post saved successfully!");
   } catch (error) {
     console.log("Error saving post", error);
   }
+}
+
+
+
+async function getPosts()
+{
+  let feedContainer = document.getElementById("feedResults");
+
+  let user = await Auth.currentAuthenticatedUser();
+
+
+  const usersWithRegisteredID = await API.graphql({
+    query: c_queries.getUserByID,
+    variables: { userID: user.attributes.sub}
+  });
+
+
+  await API.graphql(graphqlOperation(listPosts)).then((evt) => {
+        evt.data.listPosts.items.map(async (post, i) => {
+
+          const usersWithRegisteredID = await API.graphql({
+            query: c_queries.getUserByID,
+            variables: { userID: post.postedByID }
+          });
+
+          console.log("tyre" + usersWithRegisteredID.data)
+
+         feedContainer.innerHTML += `<p>${usersWithRegisteredID.data.listUsers.items[0].userEmail} - ${post.postContent}</p>`;
+       });
+    });
 }

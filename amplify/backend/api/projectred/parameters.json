@@ -1,5 +1,6 @@
 {
   "AppSyncApiName": "projectred",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": false
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthModeLastUpdated": "2022-12-07T22:11:46.236Z"
 }
